@@ -1,0 +1,36 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "C/C++: g++.exe build active file",
+			"command": "C:/MinGW/bin/g++.exe",
+			"args": [
+				"-fdiagnostics-color=always",
+				"-ggdb3",
+				"${workspaceFolder}\\*.cpp",
+				"-o",
+				"${workspaceFolder}\\main.exe",
+				"-Wall",
+				"-Wextra",
+				"-Wconversion",
+				"-Wsign-conversion",
+				"-Wshadow",
+				"-Wpedantic",
+				"-std=c++20",
+				"-D__USE_MINGW_ANSI_STDIO=1"
+			],
+			"options": {
+				"cwd": "C:/MinGW/bin"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "compiler: C:/MinGW/bin/g++.exe"
+		}
+	]
+}
