@@ -3,10 +3,11 @@
 
 int main()
 {
+
     try
     {
         bigint b("99999");
-        bigint c("99");
+        bigint c("999999999999999999999999999999999999");
         b += c;
         std::cout << b << "\n";
     }

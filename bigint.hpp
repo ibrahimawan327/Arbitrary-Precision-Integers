@@ -34,44 +34,36 @@ public:
 
     bigint &operator+=(const bigint &other)
     {
-        bool string_bigger_than_other = false;
-        if (data.size() <= other.data.size())
-        {
-            const uint64_t original_size = data.size();
-            for (uint64_t i = 0; i < (other.data.size() - original_size); i++)
-                data.insert(data.begin(), '0');
-        }
-        else
-        {
-            string_bigger_than_other = true;
-        }
+        int64_t first_index = (int64_t)data.length() - 1;
+        int64_t second_index = (int64_t)other.data.size() - 1;
+        uint8_t carryover = 0;
 
-        uint64_t carryover = 0;
-        for (uint64_t i = 0; i < data.size(); i++)
+        while (first_index >= 0 || second_index >= 0)
         {
-            const uint64_t current_index = data.size() - i - 1;
-            uint64_t second_number;
-            if (string_bigger_than_other)
-            {
-                if ((current_index - (data.size() - other.data.size())) >= 0)
-                    second_number = other.data.at(current_index - (data.size() - other.data.size()));
-                else
-                    second_number = 0;
-            }
-            else
-                second_number = char2int(other.data.at(current_index));
+            const uint8_t first_number = (first_index >= 0) ? char2int(data.at((size_t)first_index)) : 0;
+            const bool insertion_required = (first_index >= 0) ? false : true;
+            const uint8_t second_number = (second_index >= 0) ? char2int(other.data.at((size_t)second_index)) : 0;
 
-            uint64_t summation = char2int(data.at(current_index)) + second_number + carryover;
+            const uint8_t summation = first_number + second_number + carryover;
             if (summation > 9)
             {
                 carryover = 1;
-                data.replace(current_index, 1, std::to_string(summation - 10));
+                if (insertion_required)
+                    data.insert(data.begin(), int2char(summation - 10));
+                else
+                    data.replace((size_t)first_index, 1, std::to_string(summation - 10));
             }
             else
             {
                 carryover = 0;
-                data.replace(current_index, 1, std::to_string(summation));
+                if (insertion_required)
+                    data.insert(data.begin(), int2char(summation));
+                else
+                    data.replace((size_t)first_index, 1, std::to_string(summation));
             }
+
+            first_index--;
+            second_index--;
         }
 
         if (carryover == 1)
@@ -80,35 +72,21 @@ public:
         return *this;
     }
 
+    bool operator==(const bigint &other) const
+    {
+        return (data == other.data && is_negative == other.is_negative);
+    }
+
+    bool operator!=(const bigint &other) const
+    {
+        return !(*this == other);
+    }
+
     friend std::ostream &operator<<(std::ostream &out, const bigint &b);
 
 private:
-    uint64_t char2int(const char c)
-    {
-        switch (c)
-        {
-        case '0':
-            return 0;
-        case '1':
-            return 1;
-        case '2':
-            return 2;
-        case '3':
-            return 3;
-        case '4':
-            return 4;
-        case '5':
-            return 5;
-        case '6':
-            return 6;
-        case '7':
-            return 7;
-        case '8':
-            return 8;
-        case '9':
-            return 9;
-        }
-    }
+    uint64_t char2int(const char c) { return (uint64_t)(c - '0'); }
+    char int2char(const uint8_t integer) { return (char)(integer + '0'); }
 
     const static inline std::invalid_argument invalid_string = std::invalid_argument("Input string does not represent a signed string of digits!");
     const static inline std::invalid_argument empty_string = std::invalid_argument("Input string is empty!");
