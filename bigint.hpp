@@ -8,7 +8,15 @@ public:
     bigint() : data("0") {}
 
     // Do error checking here
-    bigint(const int64_t signed_integer) : data(std::to_string(signed_integer)) {}
+    bigint(const int64_t signed_integer)
+    {
+        data = std::to_string(signed_integer);
+        if (data.at(0) == '-')
+        {
+            data.erase(0, 1);
+            is_negative = true;
+        }
+    }
 
     bigint(const std::string &string_of_digits)
     {
@@ -21,15 +29,21 @@ public:
         else if (!isdigit(first_character))
             throw invalid_string;
 
-        for (uint64_t i = 1; i < string_of_digits.size(); i++)
-        {
-            if (!isdigit(string_of_digits.at(i)))
-                throw invalid_string;
-        }
-
         data = string_of_digits;
         if (is_negative)
             data.erase(0, 1);
+
+        while (*data.begin() == '0')
+            data.erase(0, 1);
+
+        if (data.empty())
+            throw empty_string;
+
+        for (uint64_t i = 0; i < data.size(); i++)
+        {
+            if (!isdigit(data.at(i)))
+                throw invalid_string;
+        }
     }
 
     bigint &operator+=(const bigint &other)
@@ -74,12 +88,26 @@ public:
 
     bool operator==(const bigint &other) const
     {
-        return (data == other.data && is_negative == other.is_negative);
+        return data == other.data && is_negative == other.is_negative;
     }
 
     bool operator!=(const bigint &other) const
     {
         return !(*this == other);
+    }
+
+    bool operator<(const bigint &other) const
+    {
+        if (is_negative && !other.is_negative)
+            return true;
+        if (!is_negative && other.is_negative)
+            return false;
+        if (is_negative && other.is_negative)
+    }
+
+    bool operator>(const bigint &other) const
+    {
+        return false;
     }
 
     friend std::ostream &operator<<(std::ostream &out, const bigint &b);
@@ -93,6 +121,12 @@ private:
     bool is_negative = false;
     std::string data;
 };
+
+bigint operator+(bigint lhs, const bigint &rhs)
+{
+    lhs += rhs;
+    return lhs;
+}
 
 std::ostream &operator<<(std::ostream &out, const bigint &b)
 {

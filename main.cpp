@@ -6,10 +6,8 @@ int main()
 
     try
     {
-        bigint b("99999");
-        bigint c("999999999999999999999999999999999999");
-        b += c;
-        std::cout << b << "\n";
+        bigint b("-00000000000");
+        std::cout << b << std::endl;
     }
     catch (const std::exception &e)
     {
