@@ -102,7 +102,7 @@ public:
             return true;
         if (!is_negative && other.is_negative)
             return false;
-        if (is_negative && other.is_negative)
+        // if (is_negative && other.is_negative)
     }
 
     bool operator>(const bigint &other) const
