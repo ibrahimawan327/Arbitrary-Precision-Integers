@@ -7,7 +7,6 @@ class bigint
 public:
     bigint() : data("0") {}
 
-    // Do error checking here
     bigint(const int64_t signed_integer)
     {
         data = std::to_string(signed_integer);
@@ -86,6 +85,25 @@ public:
         return *this;
     }
 
+    bigint &operator*=(const bigint &other)
+    {
+        bigint tmp = 1;
+        bigint original_value = *this;
+        while (tmp < other)
+        {
+            *this += original_value;
+            tmp += bigint(1);
+        }
+
+        return *this;
+    }
+
+    bigint &operator-()
+    {
+        is_negative = !is_negative;
+        return *this;
+    }
+
     bool operator==(const bigint &other) const
     {
         return data == other.data && is_negative == other.is_negative;
@@ -102,19 +120,58 @@ public:
             return true;
         if (!is_negative && other.is_negative)
             return false;
-        // if (is_negative && other.is_negative)
+        if (is_negative && other.is_negative)
+        {
+            if (data.size() != other.data.size())
+                return data.size() > other.data.size();
+
+            for (uint64_t i = 0; i < data.size(); i++)
+            {
+                if (data.at(i) != other.data.at(i))
+                    return char2int(data.at(i)) > char2int(other.data.at(i));
+            }
+
+            return false;
+        }
+
+        if (data.size() != other.data.size())
+            return data.size() < other.data.size();
+
+        for (uint64_t i = 0; i < data.size(); i++)
+        {
+            if (data.at(i) != other.data.at(i))
+                return char2int(data.at(i)) < char2int(other.data.at(i));
+        }
+
+        return false;
+    }
+
+    bool operator<=(const bigint &other) const
+    {
+        return ((*this == other) || (*this < other));
     }
 
     bool operator>(const bigint &other) const
     {
-        return false;
+        return !(*this <= other);
+    }
+
+    bool operator>=(const bigint &other) const
+    {
+        return ((*this == other) || (*this > other));
+    }
+
+    bigint &operator=(const bigint &other)
+    {
+        data = other.data;
+        is_negative = other.is_negative;
     }
 
     friend std::ostream &operator<<(std::ostream &out, const bigint &b);
 
 private:
-    uint64_t char2int(const char c) { return (uint64_t)(c - '0'); }
-    char int2char(const uint8_t integer) { return (char)(integer + '0'); }
+    uint64_t char2int(const char c) const { return (uint64_t)(c - '0'); }
+    char int2char(const uint8_t integer) const { return (char)(integer + '0'); }
 
     const static inline std::invalid_argument invalid_string = std::invalid_argument("Input string does not represent a signed string of digits!");
     const static inline std::invalid_argument empty_string = std::invalid_argument("Input string is empty!");
@@ -125,6 +182,12 @@ private:
 bigint operator+(bigint lhs, const bigint &rhs)
 {
     lhs += rhs;
+    return lhs;
+}
+
+bigint operator*(bigint lhs, const bigint &rhs)
+{
+    lhs *= rhs;
     return lhs;
 }
 
