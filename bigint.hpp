@@ -149,7 +149,7 @@ public:
             second_index--;
         }
 
-        if (*data.begin() == '0')
+        while (*data.begin() == '0')
             data.erase(0, 1);
 
         return *this;
@@ -273,6 +273,8 @@ bigint operator*(bigint lhs, const bigint &rhs)
 
 std::ostream &operator<<(std::ostream &out, const bigint &b)
 {
+    if (b.data.empty())
+        return (out << 0);
     const char sign = b.is_negative ? '-' : '+';
     out << sign << b.data;
     return out;
