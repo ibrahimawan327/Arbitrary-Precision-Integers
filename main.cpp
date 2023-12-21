@@ -7,7 +7,7 @@ int main()
 
     try
     {
-        std::cout << bigint("1111111") - bigint("00000") << std::endl;
+        std::cout << bigint("1111111") - bigint("2342") << std::endl;
     }
     catch (const std::exception &e)
     {
