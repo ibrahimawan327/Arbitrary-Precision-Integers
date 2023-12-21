@@ -45,9 +45,23 @@ public:
         }
     }
 
+    bigint(const bigint &other) : is_negative(other.is_negative), data(other.data) {}
+
     bigint &operator+=(const bigint &other)
     {
-        int64_t first_index = (int64_t)data.length() - 1;
+        if (!is_negative && other.is_negative)
+        {
+            *this -= bigint(other.data);
+            return *this;
+        }
+
+        if (is_negative && !other.is_negative)
+        {
+            *this = other - bigint(data);
+            return *this;
+        }
+
+        int64_t first_index = (int64_t)data.size() - 1;
         int64_t second_index = (int64_t)other.data.size() - 1;
         uint8_t carryover = 0;
 
@@ -64,7 +78,7 @@ public:
                 if (insertion_required)
                     data.insert(data.begin(), int2char(summation - 10));
                 else
-                    data.replace((size_t)first_index, 1, std::to_string(summation - 10));
+                    data.replace((size_t)first_index, 1, 1, int2char(summation - 10));
             }
             else
             {
@@ -72,7 +86,7 @@ public:
                 if (insertion_required)
                     data.insert(data.begin(), int2char(summation));
                 else
-                    data.replace((size_t)first_index, 1, std::to_string(summation));
+                    data.replace((size_t)first_index, 1, 1, int2char(summation));
             }
 
             first_index--;
@@ -81,6 +95,62 @@ public:
 
         if (carryover == 1)
             data.insert(data.begin(), '1');
+
+        return *this;
+    }
+
+    bigint &operator-=(const bigint &other)
+    {
+        if (is_negative && !other.is_negative)
+        {
+            is_negative = false;
+            *this += other;
+            is_negative = true;
+            return *this;
+        }
+
+        if (!is_negative && other.is_negative)
+        {
+            *this += bigint(other.data);
+            return *this;
+        }
+
+        if (is_negative && other.is_negative)
+        {
+            *this = bigint(other.data) - bigint(data);
+            return *this;
+        }
+
+        if (*this < other)
+        {
+            *this = -(other - *this);
+            return *this;
+        }
+
+        int64_t second_index = (int64_t)other.data.size() - 1;
+        uint8_t carryover = 0;
+
+        for (int64_t first_index = (int64_t)data.size() - 1; first_index >= 0; first_index--)
+        {
+            const int8_t first_number = char2int(data.at((size_t)first_index)) - carryover;
+            const uint8_t second_number = (second_index >= 0) ? char2int(other.data.at((size_t)second_index)) : 0;
+
+            if (first_number < second_number)
+            {
+                data.replace((size_t)first_index, 1, 1, int2char((uint8_t)(first_number + 10 - second_number)));
+                carryover = 1;
+            }
+            else
+            {
+                data.replace((size_t)first_index, 1, 1, int2char((uint8_t)(first_number - second_number)));
+                carryover = 0;
+            }
+
+            second_index--;
+        }
+
+        if (*data.begin() == '0')
+            data.erase(0, 1);
 
         return *this;
     }
@@ -165,12 +235,16 @@ public:
     {
         data = other.data;
         is_negative = other.is_negative;
+        return *this;
     }
 
+    friend bigint operator+(bigint lhs, const bigint &rhs);
+    friend bigint operator-(bigint lhs, const bigint &rhs);
+    friend bigint operator*(bigint lhs, const bigint &rhs);
     friend std::ostream &operator<<(std::ostream &out, const bigint &b);
 
 private:
-    uint64_t char2int(const char c) const { return (uint64_t)(c - '0'); }
+    uint8_t char2int(const char c) const { return (uint8_t)(c - '0'); }
     char int2char(const uint8_t integer) const { return (char)(integer + '0'); }
 
     const static inline std::invalid_argument invalid_string = std::invalid_argument("Input string does not represent a signed string of digits!");
@@ -182,6 +256,12 @@ private:
 bigint operator+(bigint lhs, const bigint &rhs)
 {
     lhs += rhs;
+    return lhs;
+}
+
+bigint operator-(bigint lhs, const bigint &rhs)
+{
+    lhs -= rhs;
     return lhs;
 }
 

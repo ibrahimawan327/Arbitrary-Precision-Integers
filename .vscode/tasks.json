@@ -9,7 +9,7 @@
 				"-fdiagnostics-color=always",
 				"-ggdb3",
 				"${workspaceFolder}\\*.cpp",
-				"-o2",
+				"-o",
 				"${workspaceFolder}\\main.exe",
 				"-Wall",
 				"-Wextra",
