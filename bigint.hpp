@@ -73,15 +73,15 @@ public:
 
         int64_t first_index = (int64_t)digits.size() - 1;
         int64_t second_index = (int64_t)other.digits.size() - 1;
-        uint8_t carryover = 0;
+        int64_t carryover = 0;
 
         while (first_index >= 0 || second_index >= 0)
         {
-            const uint8_t first_number = (first_index >= 0) ? char2int(digits.at((size_t)first_index)) : 0;
+            const int64_t first_number = (first_index >= 0) ? char2int(digits.at((size_t)first_index)) : 0;
             const bool insertion_required = (first_index >= 0) ? false : true;
-            const uint8_t second_number = (second_index >= 0) ? char2int(other.digits.at((size_t)second_index)) : 0;
+            const int64_t second_number = (second_index >= 0) ? char2int(other.digits.at((size_t)second_index)) : 0;
 
-            const uint8_t summation = first_number + second_number + carryover;
+            const int64_t summation = first_number + second_number + carryover;
             if (summation > 9)
             {
                 carryover = 1;
@@ -138,21 +138,21 @@ public:
         }
 
         int64_t second_index = (int64_t)other.digits.size() - 1;
-        uint8_t carryover = 0;
+        int64_t carryover = 0;
 
         for (int64_t first_index = (int64_t)digits.size() - 1; first_index >= 0; first_index--)
         {
-            const int8_t first_number = char2int(digits.at((size_t)first_index)) - carryover;
-            const uint8_t second_number = (second_index >= 0) ? char2int(other.digits.at((size_t)second_index)) : 0;
+            const int64_t first_number = char2int(digits.at((size_t)first_index)) - carryover;
+            const int64_t second_number = (second_index >= 0) ? char2int(other.digits.at((size_t)second_index)) : 0;
 
             if (first_number < second_number)
             {
-                digits.replace((size_t)first_index, 1, 1, int2char((uint8_t)(first_number + 10 - second_number)));
+                digits.replace((size_t)first_index, 1, 1, int2char(first_number + 10 - second_number));
                 carryover = 1;
             }
             else
             {
-                digits.replace((size_t)first_index, 1, 1, int2char((uint8_t)(first_number - second_number)));
+                digits.replace((size_t)first_index, 1, 1, int2char(first_number - second_number));
                 carryover = 0;
             }
 
@@ -167,17 +167,60 @@ public:
 
     bigint &operator*=(const bigint &other)
     {
-        bigint tmp = 1;
-        bigint original_value = *this;
-        while (tmp < other)
+        bigint b;
+        uint64_t padded_zeros = 0;
+        for (std::string::const_reverse_iterator outside_rit = other.digits.rbegin(); outside_rit != other.digits.rend(); outside_rit++)
         {
-            *this += original_value;
-            tmp += bigint(1);
+            const int64_t first_number = char2int(*outside_rit);
+            if (first_number == 0)
+            {
+                padded_zeros++;
+                continue;
+            }
+            std::string s;
+            int64_t carryover = 0;
+            for (int64_t second_index = (int64_t)digits.size() - 1; second_index >= 0; second_index--)
+            {
+                const int64_t second_number = char2int(digits.at((size_t)second_index));
+                const int64_t result = first_number * second_number + carryover;
+
+                if (second_index == 0)
+                {
+                    s.insert(0, std::to_string(result));
+                }
+                else if (result > 9)
+                {
+                    s.insert(s.begin(), int2char(result % 10));
+                    carryover = (result / 10);
+                }
+                else
+                {
+                    s.insert(s.begin(), int2char(result));
+                    carryover = 0;
+                }
+            }
+
+            for (uint64_t i = 0; i < padded_zeros; i++)
+                s.push_back('0');
+
+            padded_zeros++;
+            b += bigint(s);
         }
 
+        if ((is_negative && !other.is_negative) || (!is_negative && other.is_negative))
+            b.is_negative = true;
+        else
+            b.is_negative = false;
+
+        *this = b;
         return *this;
     }
 
+    /**
+     * @brief Negation operator used to switch the sign of the current bigint object
+     *
+     * @return bigint&. Reference to the current bigint object, after negation
+     */
     bigint &operator-()
     {
         is_negative = !is_negative;
@@ -293,7 +336,7 @@ public:
      * @brief Assignment (=) operator used to reassign the current object's data to the values of another bigint object
      *
      * @param other The bigint object whose data is to be assigned to the current object
-     * @return bigint& Reference to the current bigint object, after reassignment
+     * @return bigint&. Reference to the current bigint object, after reassignment
      */
     bigint &operator=(const bigint &other)
     {
@@ -308,8 +351,8 @@ public:
     friend std::ostream &operator<<(std::ostream &out, const bigint &b);
 
 private:
-    uint8_t char2int(const char c) const { return (uint8_t)(c - '0'); }
-    char int2char(const uint8_t integer) const { return (char)(integer + '0'); }
+    int64_t char2int(const char c) const { return (int64_t)(c - '0'); }
+    char int2char(const int64_t integer) const { return (char)(integer + '0'); }
 
     const static inline std::invalid_argument invalid_string = std::invalid_argument("Input string does not represent a signed string of digits!");
     const static inline std::invalid_argument empty_string = std::invalid_argument("Input string is empty!");
