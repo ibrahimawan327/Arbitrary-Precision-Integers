@@ -121,6 +121,8 @@ public:
             // In the third iteration, first_number = 4, second_number = 7, carryover = 0, summation = 11
             // In the fourth iteration, first_number = 9, second_number = 0, carryover = 1, summation = 10
             const int64_t first_number = (first_index >= 0) ? char2int(digits.at((size_t)first_index)) : 0;
+            // If the first_index still maps to a valid number in the current bigint object, first_number gets replaced by the result of the digit-digit addition.
+            // Otherwise, an insertion is required
             const bool insertion_required = (first_index >= 0) ? false : true;
             const int64_t second_number = (second_index >= 0) ? char2int(other.digits.at((size_t)second_index)) : 0;
             const int64_t summation = first_number + second_number + carryover;
@@ -192,6 +194,7 @@ public:
         }
 
         // Case 5 (Base case): Computes x - y when x and y are both positive and x >= y.
+        // Again, second_index is int64_t rather than uint64_t due to the (second_index >= 0) check below
         int64_t second_index = (int64_t)other.digits.size() - 1;
         int64_t carryover = 0;
 

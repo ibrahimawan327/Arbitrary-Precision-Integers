@@ -4,8 +4,10 @@
 
 int main()
 {
+    std::cout << bigint() - bigint() << std::endl;
 
     // Addition (+/+=) operator demonstration:
+    std::cout << "\n\nAddition operator demonstration: \n";
     try
     {
         bigint a("289347509237452983");
@@ -15,6 +17,8 @@ int main()
         std::cout << "-3425 + 94038503 = " << (a1 += bigint("94038503")) << '\n';
         std::cout << "38457609823754980 + 84357982347509237459802375908 = " << bigint(38457609823754980) + bigint("84357982347509237459802375908") << '\n';
         std::cout << "-999 + (-981) = " << bigint(-999) + bigint(-981) << '\n';
+        std::cout << "5 + (-7) = " << bigint(5) + bigint(-7) << '\n';
+        std::cout << "-17 + 44 = " << bigint(-17) + bigint(44) << '\n';
     }
     catch (const std::exception &e)
     {
@@ -22,6 +26,7 @@ int main()
     }
 
     // Subtraction (-/-=) operator demonstration:
+    std::cout << "\n\nSubtraction operator demonstration: \n";
     try
     {
         /* code */
