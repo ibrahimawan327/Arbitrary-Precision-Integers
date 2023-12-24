@@ -4,7 +4,6 @@
 
 int main()
 {
-    std::cout << bigint() - bigint() << std::endl;
 
     // Addition (+/+=) operator demonstration:
     std::cout << "\n\nAddition operator demonstration: \n";
@@ -29,10 +28,18 @@ int main()
     std::cout << "\n\nSubtraction operator demonstration: \n";
     try
     {
-        /* code */
+        std::cout << "-3847 - 43432 = " << bigint(-3847) - bigint("43432") << '\n';
+        std::cout << "3459834 - (-49038) = " << bigint("3459834") - bigint(-49038) << '\n';
+        std::cout << "-348956709348756 - (-95842376093) = " << bigint("-348956709348756") - bigint(-95842376093) << '\n';
+        std::cout << "23489 - 23489 = " << bigint("23489") - bigint(23489) << '\n';
+        bigint s;
+        std::cout << "0 - 2435324 = " << (s -= bigint("2435324")) << '\n';
+        std::cout << "234892349857230 - 238945789203 = " << bigint("234892349857230") - bigint("238945789203") << '\n';
     }
     catch (const std::exception &e)
     {
         std::cerr << e.what() << '\n';
     }
+
+    // Multiplication (*/*=) operator demonstration:
 }

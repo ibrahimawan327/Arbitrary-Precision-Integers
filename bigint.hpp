@@ -114,6 +114,7 @@ public:
         int64_t second_index = (int64_t)other.digits.size() - 1;
         int64_t carryover = 0;
 
+        // The following is the typical algorithm for addition
         while (first_index >= 0 || second_index >= 0)
         {
             // Taking the example (9456 + 743) shown below: In the first iteration, first_number = 6, second_number = 3, carryover = 0, summation = 9
@@ -149,6 +150,8 @@ public:
             second_index--;
         }
 
+        // If carryover is still 1 after the above algorithm, a final '1' needs to be added
+        // For example, 999 + 999 would compute to 998 with a carryover of 1. Due to this, add a '1' as the final step
         if (carryover == 1)
             digits.insert(digits.begin(), '1');
 
@@ -198,31 +201,40 @@ public:
         int64_t second_index = (int64_t)other.digits.size() - 1;
         int64_t carryover = 0;
 
-        for (int64_t first_index = (int64_t)digits.size() - 1; first_index >= 0; first_index--)
+        // The following is the typical algorithm for subtraction
+        for (std::string::reverse_iterator rit = digits.rbegin(); rit != digits.rend(); rit++)
         {
-            const int64_t first_number = char2int(digits.at((size_t)first_index)) - carryover;
+            const int64_t first_number = char2int(*rit) - carryover;
             const int64_t second_number = (second_index >= 0) ? char2int(other.digits.at((size_t)second_index)) : 0;
 
             if (first_number < second_number)
             {
-                digits.replace((size_t)first_index, 1, 1, int2char(first_number + 10 - second_number));
                 carryover = 1;
+                *rit = int2char(first_number + 10 - second_number);
             }
             else
             {
-                digits.replace((size_t)first_index, 1, 1, int2char(first_number - second_number));
                 carryover = 0;
+                *rit = int2char(first_number - second_number);
             }
 
             second_index--;
         }
 
-        while (*digits.begin() == '0')
+        // Remove 0's from the beginning that arise from subtracting integers that are close together in magnitude
+        // For example, 9999 - 9998 = 0001 = +1
+        while (digits.size() > 1 && digits.front() == '0')
             digits.erase(0, 1);
 
         return *this;
     }
 
+    /**
+     * @brief Multiplication (*=) operator that accepts a bigint object and multiplies its value with the current bigint object
+     *
+     * @param other The bigint object whose value is to be multiplied with the current bigint object
+     * @return bigint&. Reference to the current bigint object, after multiplication
+     */
     bigint &operator*=(const bigint &other)
     {
         bigint b;
@@ -267,8 +279,6 @@ public:
 
         if ((is_negative && !other.is_negative) || (!is_negative && other.is_negative))
             b.is_negative = true;
-        else
-            b.is_negative = false;
 
         *this = b;
         return *this;
@@ -434,8 +444,8 @@ bigint operator-(bigint b)
 
 std::ostream &operator<<(std::ostream &out, const bigint &b)
 {
-    if (b.digits.empty())
-        return (out << 0);
+    if (b.digits == "0")
+        return (out << b.digits);
     const char sign = b.is_negative ? '-' : '+';
     out << sign << b.digits;
     return out;
