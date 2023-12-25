@@ -70,11 +70,8 @@ public:
         else if (!isdigit(first_character))
             throw invalid_string;
 
-        while (*digits.begin() == '0')
+        while (digits.size() > 1 && digits.front() == '0')
             digits.erase(0, 1);
-
-        if (digits.empty())
-            throw empty_string;
 
         for (uint64_t i = 0; i < digits.size(); i++)
         {
@@ -409,39 +406,94 @@ public:
     friend std::ostream &operator<<(std::ostream &out, const bigint &b);
 
 private:
+    /**
+     * @brief
+     *
+     * @param c
+     * @return int64_t
+     */
     int64_t char2int(const char c) const { return (int64_t)(c - '0'); }
+    /**
+     * @brief
+     *
+     * @param integer
+     * @return char
+     */
     char int2char(const int64_t integer) const { return (char)(integer + '0'); }
 
     const static inline std::invalid_argument invalid_string = std::invalid_argument("Input string does not represent a signed string of digits!");
     const static inline std::invalid_argument empty_string = std::invalid_argument("Input string is empty! To instantiate a bigint with value 0, use default constructor or write bigint(0).");
+    /**
+     * @brief
+     *
+     */
     bool is_negative = false;
+
+    /**
+     * @brief
+     *
+     */
     std::string digits;
 };
 
+/**
+ * @brief
+ *
+ * @param lhs
+ * @param rhs
+ * @return bigint
+ */
 bigint operator+(bigint lhs, const bigint &rhs)
 {
     lhs += rhs;
     return lhs;
 }
 
+/**
+ * @brief
+ *
+ * @param lhs
+ * @param rhs
+ * @return bigint
+ */
 bigint operator-(bigint lhs, const bigint &rhs)
 {
     lhs -= rhs;
     return lhs;
 }
 
+/**
+ * @brief
+ *
+ * @param lhs
+ * @param rhs
+ * @return bigint
+ */
 bigint operator*(bigint lhs, const bigint &rhs)
 {
     lhs *= rhs;
     return lhs;
 }
 
+/**
+ * @brief
+ *
+ * @param b
+ * @return bigint
+ */
 bigint operator-(bigint b)
 {
     b.is_negative = !b.is_negative;
     return b;
 }
 
+/**
+ * @brief
+ *
+ * @param out
+ * @param b
+ * @return std::ostream&
+ */
 std::ostream &operator<<(std::ostream &out, const bigint &b)
 {
     if (b.digits == "0")
