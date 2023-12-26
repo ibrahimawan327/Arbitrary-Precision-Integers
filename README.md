@@ -10,7 +10,21 @@ Unlike the Python programming language, C++ does not provide built-in support fo
 
 The third constructor performs simple error-checking to verify that the input string is indeed a valid string of digits. For instance, if `Bigint b("3245dbg");` is executed inside a try-catch block, the invalid argument exception `Input string does not represent a signed string of digits!` will be thrown by the constructor. The constructor will also strip away any accidental spaces and will interpret the sign of the input string of digits based on whether the first valid character is a `-`. For example, `Bigint c("-34534590238");` is perfectly valid code whereas `Bigint c("-");` will throw an exception since there are no digits after the negative sign.
 
+The structure of the Bigint class is as follows: The magnitude of an integer is stored as a std::string of digits in a private data member called digits and the sign of an integer is stored in a private boolean variable called is_negative. When the first character of a given string is '-', the is_negative is flagged to true and the rest of the string is stored in digits.
+
+```cpp
+class Bigint
+{
+public:
+    // Constructors and Member Functions
+private:
+    bool is_negative = false;
+    std::string digits = "";
+};
+```
+
 ## Addition
+
 `Bigint &operator+=(const Bigint &other)`
 
 The core addition algorithm for 2 Bigint's is applicable when both integers are either positive or negative. This is explained below, where x and y represent positive integers and -x and -y represent negative integers.
@@ -86,6 +100,7 @@ Examples:
 * `Bigint("3495873") * Bigint()` yields `0`
 
 ## Negation
+
 `Bigint operator-(Bigint b)`
 
 The unary negation overloaded operator for the Bigint class simply takes a Bigint object by value, reverses the sign, and returns the object. It is important to note that since the original Bigint object is passed into this function by value, the original object remains unmodified.
@@ -101,6 +116,8 @@ Examples:
 
 `bool operator!=(const Bigint &other) const`
 
+The == (equals) and != (does not equal) operators compare the digits and is_negative private data members of both Bigint objects and return the result. Two Bigint objects are equal to each other if and only if their digits are equal and their is_negative flags are equal.
+
 `bool operator<(const Bigint &other) const`
 
 `bool operator<=(const Bigint &other) const`
@@ -109,6 +126,22 @@ Examples:
 
 `bool operator>=(const Bigint &other) const`
 
+The comparison operators (<=, >, >=) are based on the (<) comparison operator, as shown in the bigint.hpp file. Therefore, the following discussion explains the algorithm that determines the result of x < y, where both x and y are Bigint objects:
+
+* **Case 1**: If x is negative and y is non-negative, x < y is true.
+* **Case 2**: If x is non-negative and y is negative, x < y is false.
+* **Case 3**: If both x and y are negative, there are 2 ways x < y is true:
+  * a) If the size of x's digits > size of y's digits, this means that x is a larger number in absolute terms but since both x and y are negative, x is a smaller number.  
+  * b) If the size of x's digits = size of y's digits, loop through both Bigint's starting from the front of the std::string (most significant digit). If x[i] > y[i], we can conclude that x < y and break from the loop since again, this would indicate that x is a larger number in absolute terms.
+* **Case 4**: If both x and y are positive, this case is similar to case 3 above.
+
+Examples:
+
+* `Bigint(2001) <= Bigint("2001")` yields `true`
+* `Bigint(-1998) != Bigint(1998)` yields `true`
+* `Bigint("438597") >= Bigint("-3459083345")` yields `true`
+* `Bigint("-43") >= Bigint()` yields `false`
+  
 ## Assignment
 
 `Bigint &operator=(const Bigint &other))`
@@ -122,4 +155,11 @@ The assignment operator is used to copy the data of another Bigint object to the
 ## Insertion
 
 `std::ostream &operator<<(std::ostream &out, const Bigint &b)`
+
+The insertion operator overload appends the output stream with the sign of the Bigint object followed by the digits. 
+
+Examples:
+
+* `std::cout << Bigint("3425897") << '\n';` yields `+3425897`
+* `std::cout << Bigint("-439875") << '\n';` yields `-439875`
 

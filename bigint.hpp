@@ -10,6 +10,7 @@
 
 #include <inttypes.h>
 #include <iostream>
+#include <string>
 #include <cctype>
 
 /**

@@ -10,8 +10,6 @@
 
 #include "bigint.hpp"
 #include <iostream>
-#include <chrono>
-#include <fstream>
 
 int main()
 {
@@ -100,14 +98,17 @@ int main()
     std::cout << "\n\nComparision operator demonstrations: \n";
     try
     {
+        std::cout << std::boolalpha;
         std::cout << "348597 > 438975 --> " << (Bigint(348597) > Bigint(438975)) << '\n';
-        std::cout << "2001 <= 2001 --> " << (Bigint(2001) <= Bigint(2001)) << '\n';
+        std::cout << "2001 <= 2001 --> " << (Bigint(2001) <= Bigint("2001")) << '\n';
         std::cout << "2001 <= -17 --> " << (Bigint(2001) <= Bigint(-17)) << '\n';
         std::cout << "2349 == 2349 --> " << (Bigint(2349) == Bigint("2349")) << '\n';
         std::cout << "-1998 != 1998 --> " << (Bigint(-1998) != Bigint(1998)) << '\n';
         std::cout << "-1998 != -1998 --> " << (Bigint(-1998) != Bigint(-1998)) << '\n';
         std::cout << "438597 >= -3459083345 --> " << (Bigint("438597") >= Bigint("-3459083345")) << '\n';
+        std::cout << "438597 >= 438598 --> " << (Bigint("438597") >= Bigint("438598")) << '\n';
         std::cout << "-43 >= 0 --> " << (Bigint("-43") >= Bigint()) << '\n';
+        std::cout << std::noboolalpha;
     }
     catch (const std::exception &e)
     {
