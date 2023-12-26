@@ -119,7 +119,11 @@ int main()
     try
     {
         Bigint a("348795698432567");
-        Bigint b = a;
+        Bigint b;
+        std::cout << "a is: " << a << "\n";
+        std::cout << "b is: " << b << "\n\n";
+
+        b = a;
         std::cout << "a is: " << a << '\n';
         std::cout << "b is: " << b << "\n\n";
 

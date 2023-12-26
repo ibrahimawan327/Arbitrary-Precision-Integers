@@ -65,14 +65,11 @@ public:
             throw empty_string;
 
         // Step 3: Determine if integer is negative based on first character
-        const char first_character = digits.front();
-        if (first_character == '-' && digits.size() > 1)
+        if (digits.size() > 1 && digits.front() == '-')
         {
             is_negative = true;
             digits.erase(0, 1);
         }
-        else if (!isdigit(first_character))
-            throw invalid_string;
 
         // Step 4: Remove any accidental 0's from the beginning of the string
         while (digits.size() > 1 && digits.front() == '0')
@@ -197,6 +194,7 @@ public:
         }
 
         // Cases 4 and 5 occur when x and y are both positive integers.
+
         // Case 4: x - y is equivalent to -(y - x) and is easier to compute programmatically when x < y.
         if (*this < other)
         {
@@ -269,6 +267,7 @@ public:
                 const int64_t second_number = char2int(*rit);
                 const int64_t result = first_number * second_number + carryover;
 
+                // When the front of digits is reached, an insertion is required since there is no carryover multiplication
                 if (&(*rit) == &digits.front())
                 {
                     digit_to_number_multiplication.insert(0, std::to_string(result));
@@ -440,7 +439,16 @@ private:
      */
     char int2char(const int64_t integer) const { return (char)(integer + '0'); }
 
+    /**
+     * @brief Thrown when the user inputs a string in the wrong format to the constructor
+     *
+     */
     const static inline std::invalid_argument invalid_string = std::invalid_argument("Input string does not represent a signed string of digits!");
+
+    /**
+     * @brief Thrown when the user inputs an empty string to the constructor
+     *
+     */
     const static inline std::invalid_argument empty_string = std::invalid_argument("Input string is empty! To instantiate a Bigint with value 0, use default constructor or write Bigint(0).");
 
     /**
@@ -453,7 +461,7 @@ private:
      * @brief Used to store the magnitude of the current Bigint object, without any information of sign
      *
      */
-    std::string digits;
+    std::string digits = "";
 };
 
 /**
