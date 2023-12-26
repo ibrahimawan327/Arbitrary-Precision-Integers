@@ -17,6 +17,7 @@ class Bigint
 {
 public:
     // Constructors and Member Functions
+    
 private:
     bool is_negative = false;
     std::string digits = "";
